@@ -1,0 +1,82 @@
+#! /usr/bin/bash
+
+echo "enter the table name"
+read tableToShow
+checkSpecialChar=true
+while [ $checkSpecialChar == true ]
+do
+	if [[ $tableToShow  == *['!'@#\$%^\&*()+]* ]]
+	then
+		echo "it can't contain special characters please enter another value:"
+		read tableToShow
+
+	else
+		tableToShow=$(../../validateName $tableToShow)
+
+		checkSpecialChar=false
+	fi
+done
+
+
+cd
+
+if [ -f DBMS/$@/$tableToShow ]
+then
+	select choice in 'Select all' 'select row'
+	do
+
+	case $choice in
+	'Select all')
+		sed -n '2p' DBMS/$@/$tableToShow
+		tail -n +4 DBMS/$@/$tableToShow
+		break
+		;;
+	'select row')
+		echo "enter the primary key of the row"
+
+		typeset -i checkPKav=0
+		typeset -i checkNoPK=0
+		checkPK=true
+
+		while [ $checkPK == true ]
+		do
+			read pkRow
+			checkPKav=4
+			for i in $(tail -n +4 DBMS/$@/$tableToShow | awk '{print $1}')
+			do
+
+				if [[ $pkRow == $i ]]
+				then
+					checkNoPK=1 
+	
+					sed -n '2p' DBMS/$@/$tableToShow
+					sed -n "$checkPKav p" DBMS/$@/$tableToShow
+
+					checkPK=false
+				fi
+			let checkPKav=checkPKav+1
+			done
+
+			if [ $checkNoPK -eq 0 ]
+
+			then
+				echo "there is no primary key in this table with this value please re-enter the value :"
+			fi
+		done
+
+
+		break
+		;;
+
+	*)
+		echo "that is not a choice"
+		;;
+	esac
+done
+
+
+else
+	echo "there in no table with that name"
+
+fi
+

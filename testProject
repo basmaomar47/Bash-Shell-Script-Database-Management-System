@@ -1,0 +1,127 @@
+#! /usr/bin/bash
+
+select choice in 'Create Database' 'List Databases' 'Connect to Database' 'Drop Database' 'exit'
+do
+case $choice in 
+'Create Database') 
+
+	./createDtabase
+
+;;
+
+
+'List Databases')
+	cd ;
+
+	if [ -d "DBMS/" ]
+	then
+
+		ls -F DBMS | grep / | tr '/' ' '
+	else
+		echo "there is no databases yet"
+	fi
+
+;;
+
+
+'Connect to Database') 
+	echo "which database you want to connect to"
+	read db
+	if [ -d "DBMS/$db" ]
+	then
+		cd ./DBMS/$db
+		echo "done"
+
+		select option in 'Create Table' 'List Table' 'Drop Table' 'Insert into Table' 'Select From Table' 'Delete From Table' 'Update table' 'exit'
+		do
+		case $option in
+#############the table options#############
+
+		'Create Table')
+
+			../../creatingTable $db
+
+		;;
+
+		'List Table')
+			ls 
+
+		;;
+
+		'Drop Table')
+			echo "which table you want to delete"
+			read tableToBeDeleted
+			if [ -f "$tableToBeDeleted" ]
+			then
+				rm $tableToBeDeleted
+				echo "table deleted succefully"
+			else
+				echo "it doesn't exist already"
+			fi
+	
+		;;
+
+
+
+		'Insert into Table')
+
+
+			../../insertingIntoTable $db
+
+		;;
+		'Select From Table')
+
+
+			../../selectFromTable $db
+		;;
+		'Delete From Table')
+
+			../../deleteFromTable $db
+		;;
+		'Update table')
+
+			../../updateFromTable $db
+		;;
+
+		"exit") echo "bye"
+			break;;
+		*) echo "that is not a choice in this menu"
+
+		;;
+		esac
+		done
+
+
+	else 
+		echo "this db doesn't exist"
+	fi
+	;;
+
+
+"Drop Database")
+	cd ; 
+	echo "which database you want to drop"
+	read answer
+	databaseToBeDeleted=$(./validateName $answer)
+
+
+	if [ -d "DBMS/$databaseToBeDeleted" ]
+	then
+		rm -r DBMS/$databaseToBeDeleted
+		echo "done deleting"
+	else 
+		echo "this db doesn't exist already"
+	fi
+
+
+;;
+
+
+"exit") echo "bye bye"
+break;;
+*) echo "that is not a choice"
+
+;;
+esac
+done
+

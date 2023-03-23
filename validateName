@@ -1,0 +1,28 @@
+#! /usr/bin/bash
+
+function validation()
+{
+name=$@
+
+
+if [[ $name =~ \  ]]
+then
+
+name=${name// /_}
+echo "$name"
+
+
+elif [[ $name =~ ^[0-9] ]]
+then
+
+name=${name//[0-9]/}
+echo "$name"
+
+else 
+
+name=$name
+echo "$name"
+fi
+}
+validation $@
+

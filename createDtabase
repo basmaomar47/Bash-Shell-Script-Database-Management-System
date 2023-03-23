@@ -1,0 +1,33 @@
+#! /usr/bin/bash
+
+cd
+echo "please enter the name of the database you want to create"
+read name
+checkSpecialChar=true
+while [ $checkSpecialChar == true ]
+do
+	if [[ $name == *['!'@#\$%^\&*()+]* ]]
+	then
+		echo "it can't contain special characters please enter another value:"
+		read name
+
+	else
+		name=$(./validateName $name)
+		checkSpecialChar=false
+	fi
+done
+
+
+
+if [ -d "DBMS/$name" ]
+then
+	echo "it already exists"
+
+else
+
+
+	echo "database created and it's name is : $name"
+	mkdir -p DBMS/$name
+
+fi
+

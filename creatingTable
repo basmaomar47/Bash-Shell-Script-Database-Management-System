@@ -1,0 +1,87 @@
+#! /usr/bin/bash
+
+echo "enter the table name"
+read nameOfTable
+
+checkSpecialChar=true
+while [ $checkSpecialChar == true ]
+do
+	if [[ $nameOfTable == *['!'@#\$%^\&*()+]* ]]
+	then
+		echo "it can't contain special characters please enter another value:"
+		read nameOfTable
+
+	else
+		validatedNameOfTheTable=$(../../validateName $nameOfTable)
+		checkSpecialChar=false
+	fi
+done
+
+
+
+cd 
+if [ -f DBMS/$@/$validatedNameOfTheTable ]
+then
+	echo "this table already exists"
+
+else
+	touch DBMS/$@/$validatedNameOfTheTable
+
+	checkColumn=true
+	while [ $checkColumn == true ]
+	do
+		echo "how many columns in this table"
+		read noOfColumns
+
+		typeset -i i=0
+		typeset -i countCol=1
+
+		if [[ $noOfColumns =~ [1-9] ]]
+
+		then
+			checkColumn=false
+			echo "$noOfColumns " >> DBMS/$@/$validatedNameOfTheTable
+		else
+			checkColumn=true
+			echo "number of columns should be an integer"
+		fi
+	done
+	while [ $i -lt $noOfColumns ]
+	do
+		echo "enter the column no ${countCol} name"
+
+		let countCol=countCol+1
+		read columnName
+		validColumnName=$(./validateName $columnName)
+		arrName[i]=$validColumnName
+
+		if [[ $i == 0 ]]
+		then
+			arrType[i]=number
+		else
+			select type in string number
+			do
+			case $type in
+			string)
+				arrType[i]=string
+				break
+				;;
+			number)
+				arrType[i]=number
+				break
+				;;
+			*)
+				echo "this is not choice"
+				;;
+			esac
+	done
+fi
+let i=i+1
+done
+echo ${arrName[*]}>> DBMS/$@/$validatedNameOfTheTable
+echo ${arrType[*]}>> DBMS/$@/$validatedNameOfTheTable
+echo done successfully
+
+
+fi
+

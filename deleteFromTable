@@ -1,0 +1,54 @@
+#!/bin/bash
+
+
+cd
+echo "Enter the table name"
+read tableNamedel
+
+checkSpecialChar=true
+while [ $checkSpecialChar == true ]
+do
+	if [[ $tableNamedel  == *['!'@#\$%^\&*()+]* ]]
+	then
+		echo "it can't contain special characters please enter another value:"
+		read tableNamedel
+
+	else
+		tableNamedel=$(./validateName $tableNamedel)
+
+		checkSpecialChar=false
+	fi
+done
+
+cd
+if [[ -f DBMS/$@/$tableNamedel ]];
+then
+
+	echo "enter the primary key of the row you want to delete"
+	read delRow
+	checkPKav=4
+	typeset -i checkNoPK=0
+	for i in $(tail -n +4 DBMS/$@/$tableNamedel | awk '{print $1}')
+	do
+
+		if [[ $i == $delRow ]]
+		then
+			checkNoPK=1
+			sed -i "$checkPKav d" DBMS/$@/$tableNamedel
+		fi
+
+
+		let checkPKav=checkPKav+1
+	done
+
+	if [ $checkNoPK -eq 0 ]
+
+	then
+		echo "there is no primary key in this table with this value please re-enter the value :"
+	fi 
+
+
+else
+	echo "Table name does not exist"
+fi
+

@@ -1,0 +1,132 @@
+#! /usr/bin/bash
+
+typeset -i j=0
+typeset -i c=1
+echo "enter the table name"
+read tableToInsertIn
+
+checkPK=true
+checkSpecialChar=true
+while [ $checkSpecialChar == true ]
+do
+	if [[ $tableToInsertIn == ['!'@#\$%^\&*()+] ]]
+	then
+		echo "it can't contain special characters please enter another value:"
+		read tableToInsertIn
+
+	else
+		tableToInsertIn=$(../../validateName $tableToInsertIn)
+
+		checkSpecialChar=false
+	fi
+done
+
+cd
+
+if [ -f DBMS/$@/$tableToInsertIn ]
+then 
+
+	Firstline=$(head -n 1 DBMS/$@/$tableToInsertIn)
+	secondLine=(`sed -n '2p' DBMS/$@/$tableToInsertIn `)
+        type=(`sed -n '3p' DBMS/$@/$tableToInsertIn `)
+
+	while [ $j -lt $Firstline ]
+	do
+		
+		echo "write in ${secondLine[$j]} column the value"
+
+		if [ ${type[$j]} == number ]
+		then
+		
+			x=true
+			while [ $x == true ]
+			do
+				read value
+
+				if [[ $c == 1 ]]
+				typeset -i checkduplication=0
+				then
+					while [ $checkPK == true ]
+					do
+
+						checkduplication=0
+						for i in $(tail -n +4 DBMS/$@/$tableToInsertIn | awk '{print $1}')
+						do
+
+							if [[ $value == $i ]]
+							then
+							let checkduplication=checkduplication+1
+							#echo $checkduplication
+							fi
+						done
+						if [ $checkduplication -gt 0 ]
+						then
+							echo "primary key duplication error please re-enter the value"
+							read value
+							checkduplication=0
+
+						else 
+
+							if [[ $value == +([1-9])*([0-9]) ]]
+							then
+
+								arrContent[j]=$value
+								
+								checkPK=false
+							else
+								echo "it shoud be a number ,please re-enter the number"
+								read value
+							fi
+						fi
+
+					done
+				fi
+
+
+				if [[ $value == +([1-9])*([0-9]) ]]
+				then
+
+					arrContent[j]=$value
+					x=false
+				else
+					echo "it shoud be a number ,please re-enter the number"
+
+					x=true
+
+				fi
+			done 
+		else
+
+			read value
+			checkSpecialChar=true
+			while [ $checkSpecialChar == true ]
+			do
+				if [[ $value == *['!'@#\$%^\&*()+]* ]]
+				then
+					echo "it can't contain special characters please enter another value:"
+					read value
+
+				elif [[ $value =~ \  ]]
+				then
+					valueOfString=${value// /_}
+					checkSpecialChar=false
+
+				else
+					valueOfString=$value
+					checkSpecialChar=false
+				fi
+			done
+
+
+			arrContent[j]=$valueOfString
+		fi
+		let j=j+1
+		let c=c+1
+	done
+	echo ${arrContent[*]}>> DBMS/$@/$tableToInsertIn
+
+else
+
+echo "there in no table with that name"
+
+fi
